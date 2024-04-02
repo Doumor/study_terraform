@@ -1,0 +1,4 @@
+[cont]
+terraform-docker-ansible-openROAD
+[cont:vars]
+ansible_connection=docker

@@ -1,0 +1,29 @@
+- become: yes
+  hosts: cont
+  name: OpenROAD
+  tasks:
+    - name: Install deps
+      apt:
+        name: [wget, git, yosys, klayout, time]#tclx8.4-dev, pkg-config, libreadline-dev, bison]
+        update_cache: yes
+        state: present
+
+    - name: Download openROAD binary deb package
+      ansible.builtin.get_url:
+        url: https://github.com/Precision-Innovations/OpenROAD/releases/download/2024-04-01/openroad_2.0_amd64-ubuntu22.04-2024-04-01.deb
+        dest: /tmp/openroad_2.0_amd64-ubuntu22.04-2024-04-01.deb
+        mode: '0755'
+
+    - name: Install the deb package
+      ansible.builtin.apt:
+        deb: /tmp/openroad_2.0_amd64-ubuntu22.04-2024-04-01.deb
+
+    - name: Verify | Git checkout
+      ansible.builtin.git:
+        repo: 'https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts.git'
+        dest: /root/openROAD
+        version: v3.0
+
+    - name: Verify | Test
+      ansible.builtin.shell:
+        cmd: export OPENROAD_EXE=$(command -v openroad) && export YOSYS_CMD=$(command -v yosys) && yosys -help && openroad -help && cd /root/openROAD/flow && make
